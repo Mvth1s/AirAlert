@@ -59,6 +59,12 @@ jobs:
       - name: Build web assets
         run: pnpm build
 
+      - name: Add iOS platform
+        run: |
+          if [ ! -d ios ]; then
+            npx cap add ios
+          fi
+
       - name: Capacitor sync iOS
         run: npx cap sync ios
 
@@ -119,6 +125,12 @@ jobs:
 
       - name: Build web assets
         run: pnpm build
+
+      - name: Add iOS platform
+        run: |
+          if [ ! -d ios ]; then
+            npx cap add ios
+          fi
 
       - name: Capacitor sync iOS
         run: npx cap sync ios
