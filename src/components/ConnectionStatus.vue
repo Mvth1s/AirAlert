@@ -1,10 +1,13 @@
 <template>
   <div class="conn-status">
-    <ion-spinner v-if="isLoading" name="dots" class="conn-spinner" />
-    <div class="badge" :class="badgeClass">
-      <span class="ledot" />
-      {{ label }}
+    <div class="left-group">
+      <ion-spinner v-if="isLoading" name="dots" class="conn-spinner" />
+      <div class="badge" :class="badgeClass">
+        <span class="ledot" />
+        {{ label }}
+      </div>
     </div>
+    <span v-if="formattedTime" class="updated">{{ formattedTime }}</span>
   </div>
 </template>
 
@@ -13,7 +16,10 @@ import { computed } from 'vue'
 import { IonSpinner } from '@ionic/vue'
 import type { ConnectionStatus } from '@/types/airpods.types'
 
-const props = defineProps<{ status: ConnectionStatus }>()
+const props = defineProps<{
+  status: ConnectionStatus
+  lastUpdated?: Date | null
+}>()
 
 const STATUS_LABELS: Record<ConnectionStatus, string> = {
   disconnected: 'Déconnecté',
@@ -26,6 +32,12 @@ const STATUS_LABELS: Record<ConnectionStatus, string> = {
 const label = computed(() => STATUS_LABELS[props.status])
 const isLoading = computed(() => props.status === 'scanning' || props.status === 'connecting')
 const badgeClass = computed(() => props.status === 'connected' ? 'badge--ok' : 'badge--off')
+
+const formattedTime = computed(() =>
+  props.lastUpdated
+    ? props.lastUpdated.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    : null,
+)
 </script>
 
 <style scoped>
@@ -36,13 +48,24 @@ const badgeClass = computed(() => props.status === 'connected' ? 'badge--ok' : '
   padding: 4px 4px 14px;
 }
 
+.left-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .conn-spinner {
   width: 16px;
   height: 16px;
   color: var(--ink-2);
 }
 
-/* Badge pilule verre — reprend exactement le .badge de la maquette */
+.updated {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* Badge pilule verre */
 .badge {
   display: inline-flex;
   align-items: center;

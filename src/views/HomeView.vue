@@ -30,11 +30,23 @@
           </div>
         </div>
 
-        <ConnectionStatus :status="status" />
+        <ConnectionStatus :status="status" :last-updated="device?.lastUpdated ?? null" />
 
         <Transition name="fade" mode="out-in">
           <EmptyState v-if="!device" key="empty" @scan="onScan" />
-          <AirPodsCard v-else :key="device.id" :device="device" />
+          <div v-else :key="device.id" class="device-section">
+            <AirPodsCard :device="device" />
+            <button class="threshold-card" @click="router.push('/settings')">
+              <div class="tc-content">
+                <div class="tc-label">Seuil d'alerte</div>
+                <div class="tc-desc">
+                  Avertissement {{ settingsStore.settings.thresholds.warning }}%
+                  · Critique {{ settingsStore.settings.thresholds.critical }}%
+                </div>
+              </div>
+              <ion-icon :icon="chevronForwardOutline" class="tc-chevron" />
+            </button>
+          </div>
         </Transition>
       </div>
     </ion-content>
@@ -50,8 +62,9 @@ import {
   IonRefresher,
   IonRefresherContent,
 } from '@ionic/vue'
-import { settingsOutline, powerOutline, sunnyOutline, moonOutline } from 'ionicons/icons'
+import { settingsOutline, powerOutline, sunnyOutline, moonOutline, chevronForwardOutline } from 'ionicons/icons'
 import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAirPodsStore } from '@/stores/airpods.store'
 import { useSettingsStore } from '@/stores/settings.store'
 import { useBluetooth } from '@/composables/useBluetooth'
@@ -66,6 +79,7 @@ const settingsStore = useSettingsStore()
 const { initialize, scan, disconnect } = useBluetooth()
 const { start: startMonitor } = useBatteryMonitor()
 const { isDark, toggleTheme } = useTheme()
+const router = useRouter()
 
 const device = computed(() => airpodsStore.device)
 const status = computed(() => airpodsStore.status)
@@ -199,6 +213,57 @@ ion-content {
 
 @keyframes anim-rise {
   from { opacity: 0; transform: translateY(12px); filter: blur(8px); }
+}
+
+/* Wrapper device card + seuil */
+.device-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Carte seuil d'alerte */
+.threshold-card {
+  appearance: none;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  border-radius: 22px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    0 1px 0 var(--glass-sheen) inset,
+    0 8px 24px -12px rgba(80, 60, 200, 0.25);
+  transition: background 0.18s ease;
+  animation: anim-rise 600ms var(--ease-out-soft) 160ms both;
+}
+
+.threshold-card:hover { background: var(--glass-bg-strong); }
+
+.tc-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-1);
+  text-align: left;
+}
+
+.tc-desc {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 3px;
+  text-align: left;
+}
+
+.tc-chevron {
+  font-size: 16px;
+  color: var(--ink-3);
+  flex-shrink: 0;
 }
 
 /* Transitions entre empty state et carte */
