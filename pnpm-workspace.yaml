@@ -1,4 +1,0 @@
-settings:
-  onlyBuiltDependencies:
-    - esbuild
-    - vue-demi
