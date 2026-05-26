@@ -60,13 +60,17 @@ jobs:
         run: pnpm build
 
       - name: Add iOS platform
-        run: |
-          if [ ! -d ios ]; then
-            npx cap add ios
-          fi
+        run: npx cap add ios
 
       - name: Capacitor sync iOS
         run: npx cap sync ios
+
+      - name: Debug iOS structure
+        if: always()
+        run: |
+          echo "=== ios/ ===" && ls -la ios/ || echo "ios/ not found"
+          echo "=== ios/App/ ===" && ls -la ios/App/ || echo "ios/App/ not found"
+          echo "=== Podfile search ===" && find ios -name Podfile ! -path "*/Pods/*" || echo "No Podfile found"
 
       - name: Cache CocoaPods
         uses: actions/cache@v4
@@ -77,7 +81,12 @@ jobs:
 
       - name: Install CocoaPods
         run: |
-          cd ios/App
+          PODFILE=$(find ios -name Podfile ! -path "*/Pods/*" | head -1)
+          if [ -z "$PODFILE" ]; then
+            echo "ERROR: Podfile not found"; exit 1
+          fi
+          echo "Podfile trouvé : $PODFILE"
+          cd "$(dirname "$PODFILE")"
           pod install
 
       - name: Build iOS (unsigned)
@@ -127,10 +136,7 @@ jobs:
         run: pnpm build
 
       - name: Add iOS platform
-        run: |
-          if [ ! -d ios ]; then
-            npx cap add ios
-          fi
+        run: npx cap add ios
 
       - name: Capacitor sync iOS
         run: npx cap sync ios
@@ -143,7 +149,14 @@ jobs:
           restore-keys: pods-
 
       - name: Install CocoaPods
-        run: cd ios/App && pod install
+        run: |
+          PODFILE=$(find ios -name Podfile ! -path "*/Pods/*" | head -1)
+          if [ -z "$PODFILE" ]; then
+            echo "ERROR: Podfile not found"; exit 1
+          fi
+          echo "Podfile trouvé : $PODFILE"
+          cd "$(dirname "$PODFILE")"
+          pod install
 
       - name: Import certificate
         env:
