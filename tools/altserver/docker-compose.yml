@@ -1,0 +1,13 @@
+services:
+  altserver:
+    build: .
+    volumes:
+      # Socket usbmuxd du host pour communiquer avec l'iPhone via USB
+      - /var/run/usbmuxd:/var/run/usbmuxd
+      # IPA à installer (chemin absolu ou relatif depuis ce dossier)
+      - ${IPA_PATH:-/tmp}:/ipa:ro
+    command: >
+      -u ${DEVICE_UDID}
+      -a ${APPLE_ID}
+      -p ${APPLE_PASSWORD}
+      /ipa/AirAlert.ipa
