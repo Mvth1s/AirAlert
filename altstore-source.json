@@ -1,0 +1,33 @@
+{
+  "name": "AirAlert",
+  "identifier": "com.airalert.altstore-source",
+  "apps": [
+    {
+      "name": "AirAlert",
+      "bundleIdentifier": "com.airalert.app",
+      "developerName": "Mvth1s",
+      "subtitle": "Surveille la batterie de vos AirPods",
+      "localizedDescription": "Recevez une notification avant que vos AirPods ne tombent à plat. AirAlert surveille la batterie en arrière-plan via Bluetooth et vous alerte selon vos seuils personnalisés. Aucune donnée ne quitte votre appareil.",
+      "iconURL": "https://raw.githubusercontent.com/Mvth1s/AirAlert/main/public/icon.png",
+      "tintColor": "7C8CFF",
+      "screenshotURLs": [],
+      "versions": [
+        {
+          "version": "1.0.0",
+          "date": "2026-05-26",
+          "localizedDescription": "Première version publique.",
+          "downloadURL": "https://github.com/Mvth1s/AirAlert/releases/latest/download/AirAlert.ipa",
+          "size": 0,
+          "minOSVersion": "15.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {
+          "NSBluetoothAlwaysUsageDescription": "AirAlert utilise le Bluetooth pour lire le niveau de batterie de vos AirPods."
+        }
+      }
+    }
+  ],
+  "news": []
+}
