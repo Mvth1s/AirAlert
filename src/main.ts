@@ -5,6 +5,7 @@ import { IonicVue } from '@ionic/vue'
 import App from './App.vue'
 import router from './router'
 
+// CSS Ionic de base
 import '@ionic/vue/css/core.css'
 import '@ionic/vue/css/normalize.css'
 import '@ionic/vue/css/structure.css'
@@ -15,6 +16,12 @@ import '@ionic/vue/css/text-alignment.css'
 import '@ionic/vue/css/text-transformation.css'
 import '@ionic/vue/css/flex-utils.css'
 import '@ionic/vue/css/display.css'
+
+// Dark mode automatique selon les préférences système
+import '@ionic/vue/css/palettes/dark.system.css'
+
+// Variables CSS personnalisées AirAlert
+import '@/theme/variables.css'
 
 const app = createApp(App).use(IonicVue).use(createPinia()).use(router)
 
