@@ -11,7 +11,7 @@
 |---|---|---|---|
 | UI Framework | Vue 3 | 3.x | Interface utilisateur |
 | Language | TypeScript | 5.x | Typage statique |
-| Mobile Runtime | Capacitor | 6.x | Bridge natif iOS |
+| Mobile Runtime | Capacitor | 8.x | Bridge natif iOS |
 | UI Components | Ionic Vue | 8.x | Composants mobiles |
 | State Management | Pinia | 2.x | État global de l'app |
 | Bluetooth BLE | @capacitor-community/bluetooth-le | latest | Lecture batterie AirPods |
@@ -36,7 +36,8 @@ airalert/
 │   ├── composables/
 │   │   ├── useBluetooth.ts           # Logique BLE (scan, connexion, lecture)
 │   │   ├── useNotifications.ts       # Logique notifications locales
-│   │   └── useBatteryMonitor.ts      # Orchestration monitoring + seuils
+│   │   ├── useBatteryMonitor.ts      # Orchestration monitoring + seuils
+│   │   └── useTheme.ts               # Thème clair/sombre (singleton, data-theme)
 │   │
 │   ├── stores/
 │   │   ├── airpods.store.ts          # État AirPods (batterie, connexion)
@@ -67,9 +68,11 @@ airalert/
 │       └── build-ios.yml             # Pipeline CI/CD GitHub Actions
 │
 ├── docs/
+│   ├── ARCHITECTURE.md
 │   ├── CAHIER_DES_CHARGES.md
 │   ├── USER_STORIES.md
-│   ├── ARCHITECTURE.md
+│   ├── CONTRIBUTING.md
+│   ├── PRIVACY.md
 │   └── CICD.md
 │
 ├── capacitor.config.ts
@@ -213,10 +216,10 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build web assets
-        run: npm run build
+        run: pnpm build
 
       - name: Capacitor sync
         run: npx cap sync ios

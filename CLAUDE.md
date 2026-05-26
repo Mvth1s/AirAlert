@@ -30,6 +30,7 @@ The business logic lives entirely in three composables:
 - **`useBluetooth.ts`** — BLE scan, connect to AirPods, read Battery Service (UUID `0x180F`, characteristic `0x2A19`). Polls every 60 s in foreground; subscribes to BLE notifications for background updates.
 - **`useNotifications.ts`** — Wrapper around `@capacitor/local-notifications`. Sends warning (level 1) and critical (level 2) alerts.
 - **`useBatteryMonitor.ts`** — Orchestrates the other two. Watches the Pinia store for battery changes and fires notifications based on thresholds. Tracks `alreadyNotified.warning` and `alreadyNotified.critical` flags per charge session to prevent duplicate alerts; resets a flag when battery rises back above its threshold.
+- **`useTheme.ts`** — Singleton composable managing dark/light theme. Sets `data-theme` attribute on `<html>` and toggles `ion-palette-dark` class for Ionic. Persists preference in `localStorage`; falls back to `prefers-color-scheme` on first launch. Import it in `main.ts` to initialize before Vue mounts.
 
 ### Pinia stores (`src/stores/`)
 
@@ -77,7 +78,7 @@ The case battery is inaccessible — Apple's AAP protocol is private and must no
 - **Vue 3 Composition API only** — always use `<script setup>`, never Options API.
 - **TypeScript strict mode** — avoid `any`.
 - **Prettier** for formatting (config in `.prettierrc`), **ESLint** with Vue + TypeScript rules.
-- Run `npm run lint` before committing.
+- Run `pnpm lint` before committing.
 
 ## Commit convention
 
