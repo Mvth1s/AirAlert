@@ -21,7 +21,7 @@
             >
               <ion-icon slot="icon-only" :icon="isDark ? sunnyOutline : moonOutline" />
             </ion-button>
-            <ion-button class="icon-btn" :aria-label="device ? 'Déconnecter' : 'Aucun appareil'" @click="onDisconnect">
+            <ion-button v-if="device" class="icon-btn" aria-label="Déconnecter" @click="onDisconnect">
               <ion-icon slot="icon-only" :icon="powerOutline" />
             </ion-button>
             <ion-button class="icon-btn" router-link="/settings" aria-label="Paramètres">
