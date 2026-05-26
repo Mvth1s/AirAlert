@@ -65,34 +65,17 @@ jobs:
       - name: Capacitor sync iOS
         run: npx cap sync ios
 
-      - name: Debug iOS structure
-        if: always()
-        run: |
-          echo "=== ios/ ===" && ls -la ios/ || echo "ios/ not found"
-          echo "=== ios/App/ ===" && ls -la ios/App/ || echo "ios/App/ not found"
-          echo "=== Podfile search ===" && find ios -name Podfile ! -path "*/Pods/*" || echo "No Podfile found"
-
-      - name: Cache CocoaPods
+      - name: Cache SPM packages
         uses: actions/cache@v4
         with:
-          path: ios/App/Pods
-          key: pods-${{ hashFiles('ios/App/Podfile.lock') }}
-          restore-keys: pods-
-
-      - name: Install CocoaPods
-        run: |
-          PODFILE=$(find ios -name Podfile ! -path "*/Pods/*" | head -1)
-          if [ -z "$PODFILE" ]; then
-            echo "ERROR: Podfile not found"; exit 1
-          fi
-          echo "Podfile trouvé : $PODFILE"
-          cd "$(dirname "$PODFILE")"
-          pod install
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: spm-${{ hashFiles('ios/App/CapApp-SPM/Package.resolved') }}
+          restore-keys: spm-
 
       - name: Build iOS (unsigned)
         run: |
           xcodebuild \
-            -workspace ios/App/App.xcworkspace \
+            -project ios/App/App.xcodeproj \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
@@ -141,22 +124,12 @@ jobs:
       - name: Capacitor sync iOS
         run: npx cap sync ios
 
-      - name: Cache CocoaPods
+      - name: Cache SPM packages
         uses: actions/cache@v4
         with:
-          path: ios/App/Pods
-          key: pods-${{ hashFiles('ios/App/Podfile.lock') }}
-          restore-keys: pods-
-
-      - name: Install CocoaPods
-        run: |
-          PODFILE=$(find ios -name Podfile ! -path "*/Pods/*" | head -1)
-          if [ -z "$PODFILE" ]; then
-            echo "ERROR: Podfile not found"; exit 1
-          fi
-          echo "Podfile trouvé : $PODFILE"
-          cd "$(dirname "$PODFILE")"
-          pod install
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: spm-${{ hashFiles('ios/App/CapApp-SPM/Package.resolved') }}
+          restore-keys: spm-
 
       - name: Import certificate
         env:
@@ -188,7 +161,7 @@ jobs:
           PROVISIONING_PROFILE_NAME: ${{ secrets.PROVISIONING_PROFILE_NAME }}
         run: |
           xcodebuild \
-            -workspace ios/App/App.xcworkspace \
+            -project ios/App/App.xcodeproj \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
