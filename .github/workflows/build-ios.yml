@@ -107,27 +107,26 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          cat > /tmp/release-notes.md << 'NOTES'
+          ## Installation
+
+          Installez AirAlert **sans compte Apple Developer** via AltStore ou Sideloadly.
+
+          ### Via AltStore (recommandé)
+          1. Installez [AltStore](https://altstore.io) sur votre iPhone
+          2. Téléchargez `AirAlert.ipa` ci-dessous
+          3. AltStore → My Apps → **+** → sélectionnez l'IPA
+          4. Apps signées avec un Apple ID gratuit : expiration après **7 jours**, rouvrez AltStore pour re-signer
+
+          ### Via Sideloadly (Windows / Mac)
+          1. Installez [Sideloadly](https://sideloadly.io)
+          2. Connectez votre iPhone, glissez-déposez l'IPA, entrez votre Apple ID
+
+          ### Via TrollStore (appareils compatibles uniquement)
+          Consultez [TrollStore](https://github.com/opa334/TrollStore) pour vérifier la compatibilité iOS.
+          NOTES
           gh release delete latest --yes 2>/dev/null || true
           gh release create latest /tmp/AirAlert.ipa \
             --title "AirAlert — Latest Build" \
             --prerelease \
-            --notes "## Installation
-
-Installez AirAlert **sans compte Apple Developer** via AltStore ou Sideloadly.
-
-### Via AltStore (recommandé)
-1. Installez [AltStore](https://altstore.io) sur votre iPhone
-2. Téléchargez \`AirAlert.ipa\` ci-dessous
-3. AltStore → My Apps → **+** → sélectionnez l'IPA
-4. ⚠️ Les apps signées avec un Apple ID gratuit expirent après **7 jours** — rouvrez AltStore pour re-signer
-
-### Via Sideloadly (Windows / Mac)
-1. Installez [Sideloadly](https://sideloadly.io)
-2. Connectez votre iPhone, glissez-déposez l'IPA
-3. Entrez votre Apple ID — aucun compte payant requis
-
-### Via TrollStore (appareils compatibles uniquement)
-Consultez [TrollStore](https://github.com/opa334/TrollStore) pour vérifier la compatibilité iOS.
-
----
-*Build automatique depuis \`main\` — commit \`${{ github.sha }}\`*"
+            --notes-file /tmp/release-notes.md
