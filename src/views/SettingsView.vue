@@ -1,6 +1,6 @@
 <template>
-  <ion-page>
-    <ion-header>
+  <ion-page class="glass-page">
+    <ion-header class="glass-header" :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button default-href="/home" />
@@ -49,12 +49,165 @@
         </ion-item>
       </ion-list>
 
-      <ion-button expand="block" fill="outline" class="ion-margin-top" @click="reset">
+      <ion-button expand="block" class="reset-btn" @click="reset">
         Réinitialiser les paramètres
+      </ion-button>
+
+      <ion-button expand="block" class="onboarding-btn" @click="replayOnboarding">
+        Revoir l'onboarding
       </ion-button>
     </ion-content>
   </ion-page>
 </template>
+
+<style scoped>
+.glass-page {
+  background: var(--screen-bg);
+}
+
+ion-content {
+  --background: var(--screen-bg);
+}
+
+/* Entrée de page */
+ion-list,
+.reset-btn {
+  animation: screen-in 520ms var(--ease-out-soft) both;
+}
+
+ion-list { animation-delay: 60ms; }
+.reset-btn { animation-delay: 140ms; }
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); filter: blur(8px); }
+  to   { opacity: 1; transform: none;                         filter: blur(0); }
+}
+
+/* Header transparent + blur */
+ion-header {
+  --background: transparent;
+}
+
+ion-toolbar {
+  --background: transparent;
+  --border-width: 0;
+  --color: var(--ink-0);
+  padding-top: env(safe-area-inset-top);
+}
+
+ion-back-button {
+  --color: var(--ink-1);
+}
+
+ion-title {
+  --color: var(--ink-0);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ─── Liste verre ────────────────────────────────────────────────────────── */
+ion-list {
+  --background: transparent;
+  background: transparent;
+  padding: 0;
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+ion-list-header {
+  --background: transparent;
+  --color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding-inline-start: 4px;
+  padding-top: 24px;
+  padding-bottom: 6px;
+}
+
+ion-item {
+  --background: var(--glass-bg);
+  --background-activated: var(--glass-bg-strong);
+  --border-color: var(--glass-border-soft);
+  --color: var(--ink-0);
+  --inner-border-width: 0 0 1px 0;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 56px;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+ion-item:first-of-type {
+  border-radius: 22px 22px 0 0;
+}
+
+ion-item:last-of-type {
+  border-radius: 0 0 22px 22px;
+  --inner-border-width: 0;
+}
+
+ion-label {
+  --color: var(--ink-1);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Range accent indigo */
+ion-range {
+  --bar-background: rgba(255, 255, 255, 0.14);
+  --bar-background-active: var(--accent);
+  --knob-background: var(--ink-0);
+  --pin-background: var(--accent);
+  --pin-color: var(--ink-0);
+  max-width: 160px;
+}
+
+/* Toggle accent indigo */
+ion-toggle {
+  --track-background: rgba(255, 255, 255, 0.14);
+  --track-background-checked: var(--accent);
+  --handle-background: var(--ink-0);
+  --handle-background-checked: var(--ink-0);
+}
+
+/* ─── Boutons de bas de page ─────────────────────────────────────────────── */
+.reset-btn {
+  --background: transparent;
+  --background-activated: rgba(255, 59, 48, 0.12);
+  --border-radius: 100px;
+  --border-style: solid;
+  --border-width: 1px;
+  --border-color: rgba(255, 59, 48, 0.45);
+  --color: #FF3B30;
+  --box-shadow: none;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  margin-top: 28px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.onboarding-btn {
+  --background: transparent;
+  --background-activated: rgba(124, 140, 255, 0.12);
+  --border-radius: 100px;
+  --border-style: solid;
+  --border-width: 1px;
+  --border-color: var(--glass-border-soft);
+  --color: var(--ink-2);
+  --box-shadow: none;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+</style>
 
 <script setup lang="ts">
 import {
@@ -74,10 +227,19 @@ import {
   IonBackButton,
 } from '@ionic/vue'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
+import { Preferences } from '@capacitor/preferences'
 import { useSettingsStore } from '@/stores/settings.store'
 
 const store = useSettingsStore()
 const { settings } = storeToRefs(store)
+const router = useRouter()
+
 const save = () => store.save()
 const reset = () => store.reset()
+
+async function replayOnboarding() {
+  await Preferences.remove({ key: 'onboarding_done' })
+  router.replace('/onboarding')
+}
 </script>

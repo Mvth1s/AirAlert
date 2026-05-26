@@ -61,7 +61,7 @@ Open a [Feature Request](https://github.com/Mvth1s/airalert/issues/new) issue an
 - Your proposed solution
 - Any alternatives you considered
 
-Please keep in mind the [scope of the project](./docs/CAHIER_DES_CHARGES.md) — features requiring private Apple APIs or Android support are out of scope for v1.
+Please keep in mind the [scope of the project](./CAHIER_DES_CHARGES.md) — features requiring private Apple APIs or Android support are out of scope for v1.
 
 ---
 

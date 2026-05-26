@@ -59,13 +59,13 @@ git clone https://github.com/<your-username>/airalert.git
 cd airalert
 
 # Install dependencies
-npm install
+pnpm install
 
 # Run in browser (limited BLE support)
-npm run dev
+pnpm dev
 
 # Build web assets
-npm run build
+pnpm build
 
 # Sync with Capacitor
 npx cap sync ios
@@ -101,9 +101,12 @@ airalert/
 ├── ios/                    # Capacitor iOS project
 ├── .github/workflows/      # CI/CD pipelines
 ├── docs/                   # Project documentation
+│   ├── ARCHITECTURE.md
 │   ├── CAHIER_DES_CHARGES.md
 │   ├── USER_STORIES.md
-│   └── ARCHITECTURE.md
+│   ├── CONTRIBUTING.md
+│   ├── PRIVACY.md
+│   └── CICD.md
 └── capacitor.config.ts
 ```
 
@@ -113,13 +116,13 @@ airalert/
 
 AirAlert collects **no personal data**. All Bluetooth data is processed locally on your device. No analytics, no telemetry, no server.
 
-See [PRIVACY.md](./PRIVACY.md) for the full privacy policy (required for App Store submission).
+See [PRIVACY.md](./docs/PRIVACY.md) for the full privacy policy (required for App Store submission).
 
 ---
 
 ## Contributing
 
-Contributions are welcome! Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before submitting a pull request.
+Contributions are welcome! Please read [CONTRIBUTING.md](./docs/CONTRIBUTING.md) before submitting a pull request.
 
 ---
 
