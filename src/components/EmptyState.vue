@@ -42,8 +42,8 @@ const emit = defineEmits<{ scan: [] }>()
   border-radius: 50%;
   background:
     radial-gradient(60% 60% at 30% 30%, rgba(255, 255, 255, 0.16), transparent 70%),
-    rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+    var(--inner-bg);
+  border: 1px solid var(--glass-border-soft);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -52,6 +52,12 @@ const emit = defineEmits<{ scan: [] }>()
     0 0 0 8px rgba(255, 255, 255, 0.02);
   position: relative;
   overflow: hidden;
+  animation: float 4.8s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
 }
 
 /* Voile lumineux supérieur */

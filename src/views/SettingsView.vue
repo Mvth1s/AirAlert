@@ -65,6 +65,20 @@ ion-content {
   --background: var(--screen-bg);
 }
 
+/* Entrée de page */
+ion-list,
+.reset-btn {
+  animation: screen-in 520ms var(--ease-out-soft) both;
+}
+
+ion-list { animation-delay: 60ms; }
+.reset-btn { animation-delay: 140ms; }
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); filter: blur(8px); }
+  to   { opacity: 1; transform: none;                         filter: blur(0); }
+}
+
 /* Header transparent + blur */
 ion-header {
   --background: transparent;

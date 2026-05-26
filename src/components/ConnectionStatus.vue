@@ -72,8 +72,26 @@ const badgeClass = computed(() => props.status === 'connected' ? 'badge--ok' : '
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
+  position: relative;
 }
 
 .badge--ok  .ledot { background: var(--batt-ok);  box-shadow: 0 0 10px rgba(52, 199, 89, 0.7); }
 .badge--off .ledot { background: var(--ink-3); }
+
+/* Anneau pulsant autour du point vert */
+.badge--ok .ledot::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1.5px solid var(--batt-ok);
+  opacity: 0;
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1);   opacity: 0.8; }
+  80%  { transform: scale(2.6); opacity: 0; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
 </style>

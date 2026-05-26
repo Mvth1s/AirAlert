@@ -1,5 +1,6 @@
 <template>
   <ion-card class="airpods-card">
+    <div class="glass-shimmer" aria-hidden="true" />
     <ion-card-header>
       <div class="card-header-row">
         <div class="device-illu">
@@ -45,6 +46,7 @@ const formattedTime = computed(() =>
 /* ─── Carte principale — verre translucide ──────────────────────────────── */
 .airpods-card {
   margin: 0;
+  position: relative;
   --background: rgba(255, 255, 255, 0.08);
   --color: var(--ink-1);
   border-radius: 28px;
@@ -52,10 +54,41 @@ const formattedTime = computed(() =>
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 1px 0 var(--glass-sheen) inset,
     0 20px 40px -20px rgba(0, 0, 0, 0.6),
     0 8px 24px -12px rgba(80, 60, 200, 0.35);
   overflow: hidden;
+  transition: background 400ms var(--ease-out-soft), border-color 400ms var(--ease-out-soft);
+}
+
+/* ─── Shimmer diagonal toutes les 7s ────────────────────────────────────── */
+.glass-shimmer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.glass-shimmer::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -60%;
+  width: 70%; height: 200%;
+  background: linear-gradient(110deg,
+    transparent 30%,
+    var(--glass-highlight) 50%,
+    transparent 70%);
+  opacity: 0;
+  transform: rotate(-8deg);
+  animation: shimmer-sweep 7s var(--ease-out-soft) infinite;
+}
+
+@keyframes shimmer-sweep {
+  0%, 60%  { transform: translateX(0)    rotate(-8deg); opacity: 0; }
+  65%      { opacity: 0.18; }
+  100%     { transform: translateX(280%) rotate(-8deg); opacity: 0; }
 }
 
 /* Bande spéculaire en haut de la carte */
