@@ -42,12 +42,35 @@ AirAlert is an open-source iOS application built with **Vue 3 + Capacitor** that
 
 ---
 
-## Prerequisites
+## Installation (no Apple Developer account required)
 
-- Node.js >= 18
-- npm or pnpm
-- Xcode (for iOS build, macOS required) **or** GitHub Actions pipeline (see [Building](#building))
-- An Apple Developer account (free for TestFlight, paid for App Store)
+AirAlert is distributed as a free sideloadable IPA — no App Store, no $99/year account needed.
+
+### Via AltStore (recommended)
+1. Install [AltStore](https://altstore.io) on your iPhone
+2. Download the latest `AirAlert.ipa` from [Releases](https://github.com/Mvth1s/AirAlert/releases/latest)
+3. AltStore → My Apps → **+** → select the IPA
+4. Apps signed with a free Apple ID expire after **7 days** — open AltStore to re-sign
+
+**Or add the AltStore source directly** (auto-updates):
+```
+https://raw.githubusercontent.com/Mvth1s/AirAlert/main/altstore-source.json
+```
+
+### Via Sideloadly (Windows / Mac)
+1. Install [Sideloadly](https://sideloadly.io)
+2. Connect your iPhone, drag-and-drop the IPA, enter your Apple ID
+
+### Via TrollStore
+Check [TrollStore](https://github.com/opa334/TrollStore) for iOS version compatibility — no 7-day expiry.
+
+---
+
+## Prerequisites (for development)
+
+- Node.js >= 22
+- pnpm
+- Xcode (macOS only) **or** GitHub Actions pipeline
 
 ---
 
@@ -82,9 +105,7 @@ npx cap open ios
 ```
 
 ### Option B — GitHub Actions (no Mac required)
-The repository includes a CI/CD pipeline (`.github/workflows/build-ios.yml`) that uses a macOS GitHub Actions runner to build the `.ipa` file automatically on each push to `main`.
-
-> Requires setting up your Apple Developer credentials as GitHub Secrets (see [CI/CD documentation](./docs/CICD.md)).
+The repository includes a CI/CD pipeline (`.github/workflows/build-ios.yml`) that automatically builds and publishes an unsigned IPA to [GitHub Releases](https://github.com/Mvth1s/AirAlert/releases/latest) on every push to `main`. No Apple Developer account required.
 
 ---
 
@@ -116,7 +137,7 @@ airalert/
 
 AirAlert collects **no personal data**. All Bluetooth data is processed locally on your device. No analytics, no telemetry, no server.
 
-See [PRIVACY.md](./docs/PRIVACY.md) for the full privacy policy (required for App Store submission).
+See [PRIVACY.md](./docs/PRIVACY.md) for the full privacy policy.
 
 ---
 

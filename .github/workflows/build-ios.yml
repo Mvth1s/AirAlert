@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -37,7 +40,7 @@ jobs:
         run: pnpm type-check
 
   build-ios:
-    name: Build iOS (unsigned)
+    name: Build iOS
     runs-on: macos-latest
     needs: lint
 
@@ -72,7 +75,7 @@ jobs:
           key: spm-${{ hashFiles('ios/App/CapApp-SPM/Package.resolved') }}
           restore-keys: spm-
 
-      - name: Build iOS (unsigned)
+      - name: Build archive (unsigned)
         run: |
           xcodebuild \
             -project ios/App/App.xcodeproj \
@@ -85,105 +88,46 @@ jobs:
             -archivePath ${{ runner.temp }}/AirAlert.xcarchive \
             archive
 
-      - name: Upload archive
+      - name: Package IPA
+        run: |
+          APP=$(find ${{ runner.temp }}/AirAlert.xcarchive/Products -name "*.app" | head -1)
+          mkdir -p /tmp/Payload
+          cp -r "$APP" /tmp/Payload/
+          cd /tmp && zip -r AirAlert.ipa Payload/
+
+      - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AirAlert-unsigned-${{ github.sha }}
-          path: ${{ runner.temp }}/AirAlert.xcarchive
-          retention-days: 7
+          name: AirAlert-${{ github.sha }}
+          path: /tmp/AirAlert.ipa
+          retention-days: 30
 
-  # Job optionnel : signature et export vers TestFlight
-  # Nécessite les secrets Apple Developer configurés (voir docs/CICD.md)
-  distribute-testflight:
-    name: Distribute to TestFlight
-    runs-on: macos-latest
-    needs: build-ios
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build web assets
-        run: pnpm build
-
-      - name: Add iOS platform
-        run: npx cap add ios
-
-      - name: Capacitor sync iOS
-        run: npx cap sync ios
-
-      - name: Cache SPM packages
-        uses: actions/cache@v4
-        with:
-          path: ~/Library/Caches/org.swift.swiftpm
-          key: spm-${{ hashFiles('ios/App/CapApp-SPM/Package.resolved') }}
-          restore-keys: spm-
-
-      - name: Import certificate
+      - name: Publish GitHub Release
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
-          CERTIFICATE_BASE64: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE_BASE64 }}
-          CERTIFICATE_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          echo "$CERTIFICATE_BASE64" | base64 --decode -o $RUNNER_TEMP/certificate.p12
-          security import "$RUNNER_TEMP/certificate.p12" -P "$CERTIFICATE_PASSWORD" \
-            -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
-          security list-keychain -d user -s "$KEYCHAIN_PATH"
+          gh release delete latest --yes 2>/dev/null || true
+          gh release create latest /tmp/AirAlert.ipa \
+            --title "AirAlert — Latest Build" \
+            --prerelease \
+            --notes "## Installation
 
-      - name: Install provisioning profile
-        env:
-          PROVISIONING_PROFILE_BASE64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
-        run: |
-          PP_PATH=$RUNNER_TEMP/profile.mobileprovision
-          echo "$PROVISIONING_PROFILE_BASE64" | base64 --decode -o "$PP_PATH"
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
+Installez AirAlert **sans compte Apple Developer** via AltStore ou Sideloadly.
 
-      - name: Build & archive (signed)
-        env:
-          CODE_SIGN_IDENTITY: ${{ secrets.CODE_SIGN_IDENTITY }}
-          PROVISIONING_PROFILE_NAME: ${{ secrets.PROVISIONING_PROFILE_NAME }}
-        run: |
-          xcodebuild \
-            -project ios/App/App.xcodeproj \
-            -scheme App \
-            -configuration Release \
-            -sdk iphoneos \
-            "CODE_SIGN_IDENTITY=$CODE_SIGN_IDENTITY" \
-            "PROVISIONING_PROFILE_SPECIFIER=$PROVISIONING_PROFILE_NAME" \
-            -archivePath ${{ runner.temp }}/AirAlert-signed.xcarchive \
-            archive
+### Via AltStore (recommandé)
+1. Installez [AltStore](https://altstore.io) sur votre iPhone
+2. Téléchargez \`AirAlert.ipa\` ci-dessous
+3. AltStore → My Apps → **+** → sélectionnez l'IPA
+4. ⚠️ Les apps signées avec un Apple ID gratuit expirent après **7 jours** — rouvrez AltStore pour re-signer
 
-      - name: Export IPA
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath ${{ runner.temp }}/AirAlert-signed.xcarchive \
-            -exportOptionsPlist ios/App/ExportOptions.plist \
-            -exportPath ${{ runner.temp }}/export
+### Via Sideloadly (Windows / Mac)
+1. Installez [Sideloadly](https://sideloadly.io)
+2. Connectez votre iPhone, glissez-déposez l'IPA
+3. Entrez votre Apple ID — aucun compte payant requis
 
-      - name: Upload to TestFlight
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-        run: |
-          xcrun altool --upload-app \
-            -f "${{ runner.temp }}/export/AirAlert.ipa" \
-            -t ios \
-            -u "$APPLE_ID" \
-            -p "$APPLE_APP_SPECIFIC_PASSWORD"
+### Via TrollStore (appareils compatibles uniquement)
+Consultez [TrollStore](https://github.com/opa334/TrollStore) pour vérifier la compatibilité iOS.
+
+---
+*Build automatique depuis \`main\` — commit \`${{ github.sha }}\`*"
