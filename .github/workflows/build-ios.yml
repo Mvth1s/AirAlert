@@ -20,11 +20,11 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: pnpm
 
       - name: Install dependencies
@@ -46,11 +46,11 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: pnpm
 
       - name: Install dependencies
@@ -59,25 +59,23 @@ jobs:
       - name: Build web assets
         run: pnpm build
 
+      - name: Add iOS platform
+        run: npx cap add ios
+
       - name: Capacitor sync iOS
         run: npx cap sync ios
 
-      - name: Cache CocoaPods
+      - name: Cache SPM packages
         uses: actions/cache@v4
         with:
-          path: ios/App/Pods
-          key: pods-${{ hashFiles('ios/App/Podfile.lock') }}
-          restore-keys: pods-
-
-      - name: Install CocoaPods
-        run: |
-          cd ios/App
-          pod install
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: spm-${{ hashFiles('ios/App/CapApp-SPM/Package.resolved') }}
+          restore-keys: spm-
 
       - name: Build iOS (unsigned)
         run: |
           xcodebuild \
-            -workspace ios/App/App.xcworkspace \
+            -project ios/App/App.xcodeproj \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
@@ -107,11 +105,11 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: pnpm
 
       - name: Install dependencies
@@ -120,18 +118,18 @@ jobs:
       - name: Build web assets
         run: pnpm build
 
+      - name: Add iOS platform
+        run: npx cap add ios
+
       - name: Capacitor sync iOS
         run: npx cap sync ios
 
-      - name: Cache CocoaPods
+      - name: Cache SPM packages
         uses: actions/cache@v4
         with:
-          path: ios/App/Pods
-          key: pods-${{ hashFiles('ios/App/Podfile.lock') }}
-          restore-keys: pods-
-
-      - name: Install CocoaPods
-        run: cd ios/App && pod install
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: spm-${{ hashFiles('ios/App/CapApp-SPM/Package.resolved') }}
+          restore-keys: spm-
 
       - name: Import certificate
         env:
@@ -163,7 +161,7 @@ jobs:
           PROVISIONING_PROFILE_NAME: ${{ secrets.PROVISIONING_PROFILE_NAME }}
         run: |
           xcodebuild \
-            -workspace ios/App/App.xcworkspace \
+            -project ios/App/App.xcodeproj \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
