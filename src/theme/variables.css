@@ -1,0 +1,19 @@
+/* Personnalisation AirAlert par-dessus les variables Ionic */
+
+:root {
+  --ion-font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial,
+    sans-serif;
+
+  /* Arrondi légèrement augmenté pour les cartes */
+  --ion-card-border-radius: 16px;
+}
+
+/* Couleur primaire : bleu iOS system */
+:root {
+  --ion-color-primary: #007aff;
+  --ion-color-primary-rgb: 0, 122, 255;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #006be0;
+  --ion-color-primary-tint: #1a87ff;
+}
