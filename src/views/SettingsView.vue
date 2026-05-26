@@ -52,6 +52,10 @@
       <ion-button expand="block" class="reset-btn" @click="reset">
         Réinitialiser les paramètres
       </ion-button>
+
+      <ion-button expand="block" class="onboarding-btn" @click="replayOnboarding">
+        Revoir l'onboarding
+      </ion-button>
     </ion-content>
   </ion-page>
 </template>
@@ -169,7 +173,7 @@ ion-toggle {
   --handle-background-checked: var(--ink-0);
 }
 
-/* ─── Bouton réinitialiser ───────────────────────────────────────────────── */
+/* ─── Boutons de bas de page ─────────────────────────────────────────────── */
 .reset-btn {
   --background: transparent;
   --background-activated: rgba(255, 59, 48, 0.12);
@@ -184,6 +188,23 @@ ion-toggle {
   margin-top: 28px;
   font-size: 15px;
   font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.onboarding-btn {
+  --background: transparent;
+  --background-activated: rgba(124, 140, 255, 0.12);
+  --border-radius: 100px;
+  --border-style: solid;
+  --border-width: 1px;
+  --border-color: var(--glass-border-soft);
+  --color: var(--ink-2);
+  --box-shadow: none;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: -0.01em;
 }
 </style>
@@ -206,10 +227,19 @@ import {
   IonBackButton,
 } from '@ionic/vue'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
+import { Preferences } from '@capacitor/preferences'
 import { useSettingsStore } from '@/stores/settings.store'
 
 const store = useSettingsStore()
 const { settings } = storeToRefs(store)
+const router = useRouter()
+
 const save = () => store.save()
 const reset = () => store.reset()
+
+async function replayOnboarding() {
+  await Preferences.remove({ key: 'onboarding_done' })
+  router.replace('/onboarding')
+}
 </script>

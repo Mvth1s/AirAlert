@@ -17,11 +17,14 @@ import '@ionic/vue/css/text-transformation.css'
 import '@ionic/vue/css/flex-utils.css'
 import '@ionic/vue/css/display.css'
 
-// Dark mode automatique selon les préférences système
-import '@ionic/vue/css/palettes/dark.system.css'
+// Dark mode via classe .ion-palette-dark (contrôlé par useTheme)
+import '@ionic/vue/css/palettes/dark.class.css'
 
 // Variables CSS personnalisées AirAlert
 import '@/theme/variables.css'
+
+// Initialiser le thème avant le montage (évite un flash)
+import '@/composables/useTheme'
 
 const app = createApp(App).use(IonicVue).use(createPinia()).use(router)
 

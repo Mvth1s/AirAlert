@@ -103,9 +103,8 @@
   --ion-card-border-radius: 28px;
 }
 
-/* ─── Thème clair ─────────────────────────────────────────────────────────── */
-@media (prefers-color-scheme: light) {
-  :root {
+/* ─── Thème clair (activé par useTheme via data-theme="light") ───────────── */
+:root[data-theme="light"] {
     --ink-0:  #0c1024;
     --ink-1:  rgba(12, 16, 36, 0.96);
     --ink-2:  rgba(12, 16, 36, 0.66);
@@ -179,7 +178,6 @@
     --ion-color-light-tint:     rgba(12, 16, 36, 0.14);
 
     --ion-item-background: var(--glass-bg);
-  }
 }
 
 /* ─── Respect prefers-reduced-motion ─────────────────────────────────────── */

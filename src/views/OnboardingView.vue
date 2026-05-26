@@ -163,11 +163,10 @@ ion-content {
   animation: dot-grow 500ms var(--ease-out-pop);
 }
 
-@media (prefers-color-scheme: light) {
-  .dot.active {
-    background: var(--accent);
-    box-shadow: 0 0 12px var(--accent-glow);
-  }
+/* En thème clair, le dot actif reprend l'accent */
+:root[data-theme="light"] .dot.active {
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
 }
 
 @keyframes dot-grow {

@@ -1,21 +1,5 @@
 <template>
   <ion-page class="glass-page">
-    <ion-header class="glass-header" :translucent="true">
-      <ion-toolbar>
-        <ion-title class="app-title">
-          <span class="accent-dot" aria-hidden="true" />AirAlert
-        </ion-title>
-        <ion-buttons slot="end">
-          <ion-button v-if="device" class="icon-btn" @click="onDisconnect">
-            <ion-icon slot="icon-only" :icon="powerOutline" />
-          </ion-button>
-          <ion-button class="icon-btn" router-link="/settings">
-            <ion-icon slot="icon-only" :icon="settingsOutline" />
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
     <ion-content :fullscreen="true">
       <ion-refresher slot="fixed" @ion-refresh="onRefresh">
         <ion-refresher-content />
@@ -23,6 +7,29 @@
 
       <div class="screen-body">
         <div class="bg-glow" aria-hidden="true" />
+
+        <!-- Header custom (identique à la maquette) -->
+        <div class="app-header">
+          <div class="app-title">
+            <span class="accent-dot" aria-hidden="true" />AirAlert
+          </div>
+          <div class="icon-row">
+            <ion-button
+              class="icon-btn"
+              :aria-label="isDark ? 'Passer en thème clair' : 'Passer en thème sombre'"
+              @click="toggleTheme"
+            >
+              <ion-icon slot="icon-only" :icon="isDark ? sunnyOutline : moonOutline" />
+            </ion-button>
+            <ion-button class="icon-btn" :aria-label="device ? 'Déconnecter' : 'Aucun appareil'" @click="onDisconnect">
+              <ion-icon slot="icon-only" :icon="powerOutline" />
+            </ion-button>
+            <ion-button class="icon-btn" router-link="/settings" aria-label="Paramètres">
+              <ion-icon slot="icon-only" :icon="settingsOutline" />
+            </ion-button>
+          </div>
+        </div>
+
         <ConnectionStatus :status="status" />
 
         <Transition name="fade" mode="out-in">
@@ -37,22 +44,19 @@
 <script setup lang="ts">
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonButton,
-  IonButtons,
   IonIcon,
   IonRefresher,
   IonRefresherContent,
 } from '@ionic/vue'
-import { settingsOutline, powerOutline } from 'ionicons/icons'
+import { settingsOutline, powerOutline, sunnyOutline, moonOutline } from 'ionicons/icons'
 import { computed, onMounted } from 'vue'
 import { useAirPodsStore } from '@/stores/airpods.store'
 import { useSettingsStore } from '@/stores/settings.store'
 import { useBluetooth } from '@/composables/useBluetooth'
 import { useBatteryMonitor } from '@/composables/useBatteryMonitor'
+import { useTheme } from '@/composables/useTheme'
 import AirPodsCard from '@/components/AirPodsCard.vue'
 import ConnectionStatus from '@/components/ConnectionStatus.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -61,6 +65,7 @@ const airpodsStore = useAirPodsStore()
 const settingsStore = useSettingsStore()
 const { initialize, scan, disconnect } = useBluetooth()
 const { start: startMonitor } = useBatteryMonitor()
+const { isDark, toggleTheme } = useTheme()
 
 const device = computed(() => airpodsStore.device)
 const status = computed(() => airpodsStore.status)
@@ -81,7 +86,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Fond dégradé profond sur toute la page */
 .glass-page {
   background: var(--screen-bg);
 }
@@ -90,25 +94,31 @@ ion-content {
   --background: var(--screen-bg);
 }
 
-/* Header transparent + blur */
-.glass-header {
-  --background: transparent;
+/* ─── Contenu scrollable avec safe area ─────────────────────────────────── */
+.screen-body {
+  padding: calc(env(safe-area-inset-top) + 14px) 20px calc(env(safe-area-inset-bottom) + 20px);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  position: relative;
+  isolation: isolate;
+  animation: screen-in 520ms var(--ease-out-soft) both;
 }
 
-ion-toolbar {
-  --background: transparent;
-  --border-width: 0;
-  --color: var(--ink-0);
-  padding-top: env(safe-area-inset-top);
+/* ─── Header custom ──────────────────────────────────────────────────────── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px 18px;
 }
 
-/* Titre avec point lumineux accent */
 .app-title {
-  --color: var(--ink-0);
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  display: flex;
+  color: var(--ink-0);
+  display: inline-flex;
   align-items: center;
 }
 
@@ -119,14 +129,18 @@ ion-toolbar {
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 12px var(--accent-glow);
-  margin-right: 8px;
-  vertical-align: 2px;
+  margin-right: 10px;
   animation: accent-breathe 3.6s ease-in-out infinite;
 }
 
 @keyframes accent-breathe {
   0%, 100% { box-shadow: 0 0 10px var(--accent-glow); transform: scale(1); }
   50%      { box-shadow: 0 0 18px var(--accent-glow), 0 0 30px var(--accent-soft); transform: scale(1.15); }
+}
+
+.icon-row {
+  display: flex;
+  gap: 10px;
 }
 
 /* Boutons icône circulaires verre */
@@ -145,20 +159,10 @@ ion-toolbar {
   height: 38px;
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
+  transition: --background 300ms, --border-color 300ms;
 }
 
-/* Contenu scrollable */
-.screen-body {
-  padding: 8px 20px 20px;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  position: relative;
-  isolation: isolate;
-  animation: screen-in 520ms var(--ease-out-soft) both;
-}
-
-/* Lueur ambiante dérivante en arrière-plan */
+/* ─── Lueur ambiante dérivante ───────────────────────────────────────────── */
 .bg-glow {
   position: absolute;
   inset: -10%;
@@ -177,6 +181,7 @@ ion-toolbar {
   100% { transform: translate(3%, -2%) scale(1.04); opacity: 0.9; }
 }
 
+/* ─── Entrée de page ─────────────────────────────────────────────────────── */
 @keyframes screen-in {
   from { opacity: 0; transform: translateY(10px) scale(0.985); filter: blur(8px); }
   to   { opacity: 1; transform: none;                         filter: blur(0); }
