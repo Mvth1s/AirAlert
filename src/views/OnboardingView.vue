@@ -130,6 +130,12 @@ ion-content {
   flex-direction: column;
   min-height: 100vh;
   padding: calc(env(safe-area-inset-top) + 48px) 24px calc(env(safe-area-inset-bottom) + 32px);
+  animation: screen-in 520ms var(--ease-out-soft) both;
+}
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); filter: blur(8px); }
+  to   { opacity: 1; transform: none;                         filter: blur(0); }
 }
 
 /* ─── Dots de progression — reprend la maquette ─────────────────────────── */
@@ -154,6 +160,18 @@ ion-content {
   width: 28px;
   background: var(--ink-0);
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+  animation: dot-grow 500ms var(--ease-out-pop);
+}
+
+/* En thème clair, le dot actif reprend l'accent */
+:root[data-theme="light"] .dot.active {
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+@keyframes dot-grow {
+  from { width: 8px; }
+  to   { width: 28px; }
 }
 
 /* Dot complété */
@@ -190,12 +208,52 @@ ion-content {
   color: var(--ink-0);
 }
 
+/* Flottement + légère rotation de l'illustration */
+.ob-illu {
+  animation: ob-float 5s ease-in-out infinite;
+}
+
+@keyframes ob-float {
+  0%, 100% { transform: translateY(0)     rotate(0deg); }
+  50%      { transform: translateY(-10px) rotate(-1deg); }
+}
+
 .ob-illu::before {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.30), transparent 40%);
   pointer-events: none;
+  z-index: 1;
+}
+
+/* Halo intérieur pulsant accordé à la teinte de l'étape */
+.ob-illu::after {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 140, 255, 0.55), transparent 65%);
+  opacity: 0.6;
+  animation: ob-pulse 3.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.ob-illu.welcome::after {
+  background: radial-gradient(circle, rgba(180, 120, 255, 0.55), transparent 65%);
+}
+
+.ob-illu.bluetooth::after {
+  background: radial-gradient(circle, rgba(80, 150, 255, 0.55), transparent 65%);
+}
+
+.ob-illu.notifications::after {
+  background: radial-gradient(circle, rgba(124, 140, 255, 0.55), transparent 65%);
+}
+
+@keyframes ob-pulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.35; }
+  50%      { transform: scale(1.1);  opacity: 0.70; }
 }
 
 /* Variantes de couleur par étape */
@@ -220,7 +278,7 @@ ion-content {
 .ob-icon {
   font-size: 66px;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* ─── Textes ─────────────────────────────────────────────────────────────── */
@@ -288,9 +346,9 @@ ion-content {
 /* ─── Transitions entre étapes ──────────────────────────────────────────── */
 .slide-left-enter-active,
 .slide-left-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.3s var(--ease-out-soft), transform 0.3s var(--ease-out-soft), filter 0.3s var(--ease-out-soft);
 }
 
-.slide-left-enter-from { opacity: 0; transform: translateX(32px); }
-.slide-left-leave-to   { opacity: 0; transform: translateX(-32px); }
+.slide-left-enter-from { opacity: 0; transform: translateX(32px);  filter: blur(6px); }
+.slide-left-leave-to   { opacity: 0; transform: translateX(-32px); filter: blur(6px); }
 </style>
